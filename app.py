@@ -13,7 +13,7 @@ def translate():
 	output_behavior.write("{\n")
 	output_behavior.write("  name         = lawnmower\n")
 	output_behavior.write("  pwt          = 100\n")
-	#output_behavior.write("  condition    = MODE==ACTIVE:LAWNMOWER\n")
+	output_behavior.write("  condition    = \n")
 	output_behavior.write("  speed = 1\n")
 	output_behavior.write("  capture_radius = 3\n")
 	output_behavior.write("  slip_radius = 7\n")
