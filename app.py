@@ -7,7 +7,8 @@ def translate():
 	relative_coords = open("meter_coords.txt", "r")
 	points = relative_coords.readlines()
 
-	output_behavior = open("LAWNMOWER", "w")
+	#this path is just for the demo
+	output_behavior = open("py-mp-decomp/input/SAR_BOT/LAWNMOWER", "w")
 
 	output_behavior.write("Behavior = BHV_Waypoint\n")
 	output_behavior.write("{\n")
