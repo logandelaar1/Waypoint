@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    <style>
+        #map { width: 100%; height: 100%; }
+        body { margin: 0; padding: 0; }
+        html, body { height: 100%; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <button onclick="processPolygon()">Process Polygon</button>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script>
+        var map = L.map('map').setView([41.35036468760044, -74.06017358880491], 19);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
+        var drawControl = new L.Control.Draw({
+            draw: {
+                polygon: true,
+                polyline: false,
+                circle: false,
+                marker: false,
+                circlemarker: false,
+            },
+            edit: {
+                featureGroup: drawnItems,
+                edit: false,
+            },
+        });
+        map.addControl(drawControl);
+
+        var polygon_coords = [];
+        map.on(L.Draw.Event.CREATED, function (e) {
+            var layer = e.layer;
+            drawnItems.addLayer(layer);
+            polygon_coords = layer.getLatLngs()[0];
+
+            fetch('/log_polygon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    polygon_coords: polygon_coords
+                }),
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data); // To show the response (e.g., 'success')
+                processPolygon(); // Process the polygon after it is drawn
+            });
+        });
+
+        function drawLines(lines) {
+            lines.forEach(line => {
+                var polyline = L.polyline(line, {color: 'blue'}).addTo(map);
+                drawnItems.addLayer(polyline);
+            });
+        }
+
+        function processPolygon() {
+            fetch('/process_polygon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    polygon_coords: polygon_coords
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                var path_points = data.path_points;
+                var lines = [];
+                for (var i = 0; i < path_points.length - 1; i++) {
+                    lines.push([path_points[i], path_points[i+1]]);
+                }
+                drawLines(lines);
+                console.log("Width in meters: " + data.width);
+                console.log("Height in meters: " + data.height);
+            });
+        }
+    </script>
+</body>
+</html>
