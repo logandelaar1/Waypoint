@@ -82,7 +82,7 @@ class PolygonProcessor:
         shapely_polygon = SPolygon(self.coords)
         buffered_polygon = shapely_polygon.buffer(-0.00005)  # Adjusted for degrees
 
-        step = 0.00007  # Adjusted for degrees
+        step = 0.00016  # Adjusted for degrees
         x_min, y_min, x_max, y_max = buffered_polygon.bounds
 
         x_min += step
