@@ -7,14 +7,13 @@ def translate():
 	relative_coords = open("meter_coords.txt", "r")
 	points = relative_coords.readlines()
 
-	#this path is just for the demo
-	output_behavior = open("py-mp-decomp/input/SAR_BOT/LAWNMOWER", "w")
+	output_behavior = open("LAWNMOWER", "w")
 
 	output_behavior.write("Behavior = BHV_Waypoint\n")
 	output_behavior.write("{\n")
 	output_behavior.write("  name         = lawnmower\n")
 	output_behavior.write("  pwt          = 100\n")
-	output_behavior.write("  condition    = \n")
+	#output_behavior.write("  condition    = MODE==ACTIVE:LAWNMOWER\n")
 	output_behavior.write("  speed = 1\n")
 	output_behavior.write("  capture_radius = 3\n")
 	output_behavior.write("  slip_radius = 7\n")
@@ -52,7 +51,7 @@ class CoordinateGraph:
                             (destination.latitude, self.origin.longitude)).meters
         if destination.latitude < self.origin.latitude:
             lat_diff = -lat_diff
-
+    
         # Calculate difference in longitude (East/West direction)
         long_diff = geodesic((self.origin.latitude, self.origin.longitude), 
                              (self.origin.latitude, destination.longitude)).meters
@@ -95,6 +94,7 @@ class PolygonProcessor:
         direction = 'right'
         y = y_min
         while y <= y_max:
+            
             if direction == 'right':
                 lines.append(LineString([(x_min, y), (x_max, y)]))
                 direction = 'left'
@@ -105,15 +105,7 @@ class PolygonProcessor:
 
         lines_gdf = gpd.GeoDataFrame(geometry=lines, crs='EPSG:4326')
         self.clipped = gpd.clip(lines_gdf, buffered_polygon)
-
-        with open('step.txt', 'w') as f:
-            for step in lines:
-                for point in step.coords:
-                    lng, lat = point
-                    f.write(f"Longitude: {lng}, Latitude: {lat}\n")
-        graph = CoordinateGraph(41.34928, -74.063645)  
-        graph.process_file('step.txt', 'meter_coords.txt') 
-        translate()
+        
 
             
 
@@ -127,8 +119,15 @@ class PolygonProcessor:
         for geom in self.clipped.geometry:
             if geom.geom_type == 'LineString':
                 path_points.extend(process_line_points(geom))
-
+        with open('step.txt', 'w') as f:
+            for i in path_points:
+                # write each point on a new line
+                f.write(f"Longitude: {i['lng']}, Latitude: {i['lat']}\n")
+        graph = CoordinateGraph(41.34928, -74.063645)  
+        graph.process_file('step.txt', 'meter_coords.txt') 
+        translate()
         return path_points
+
 
 app = Flask(__name__)
 
