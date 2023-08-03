@@ -3,6 +3,20 @@ from shapely.geometry import Polygon as SPolygon, LineString
 import geopandas as gpd
 from geopy import Point
 from geopy.distance import geodesic
+import webbrowser
+import multiprocessing
+import time
+import sys
+
+# URL you want to open
+url = "http://127.0.0.1:5000"
+
+
+
+def browser():
+    time.sleep(5)
+    webbrowser.open_new(url)
+
 def translate():
 	relative_coords = open("meter_coords.txt", "r")
 	points = relative_coords.readlines()
@@ -22,6 +36,9 @@ def translate():
 	output_behavior.write("  repeat = forever\n")
 
 	output_behavior.write("  points = pts={")
+
+    
+
 
 
 	index = 0
@@ -160,5 +177,13 @@ def process_polygon():
 
     return jsonify({"path_points": path_points, "width": width, "height": height}), 200
 
+def open_app():
+    app.run(debug=False)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    p1 = multiprocessing.Process(target=open_app)
+    p2 = multiprocessing.Process(target=browser)
+    p1.start()
+    p2.start()
+    p1.join()
+    p2.join()
