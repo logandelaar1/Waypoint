@@ -18,7 +18,7 @@
     <script>
         var map = L.map('map').setView([41.35036468760044, -74.06017358880491], 19);
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19,
+            maxZoom: 20,
         }).addTo(map);
 
         var drawnItems = new L.FeatureGroup();
@@ -63,7 +63,7 @@
 
         function drawLines(lines) {
             lines.forEach(line => {
-                var polyline = L.polyline(line, {color: 'blue'}).addTo(map);
+                var polyline = L.polyline(line, {color: 'white'}).addTo(map);
                 drawnItems.addLayer(polyline);
             });
         }
