@@ -1,3 +1,7 @@
+<!-- 
+    Author: Logan deLaar 
+    Github: Logandelaar1
+-->
 from flask import Flask, render_template, request, jsonify
 from shapely.geometry import Polygon as SPolygon, LineString
 import geopandas as gpd
